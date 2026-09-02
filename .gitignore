@@ -1,0 +1,45 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug*/
+[Rr]elease*/
+artifacts/
+TestResults/
+
+# .NET tooling
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+project.lock.json
+project.fragment.lock.json
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Local configuration and secrets
+*.userprefs
+appsettings.Local.json
+appsettings.*.Local.json
+
+# Entity Framework generated files
+*.efpt.config.json
+
+# Frontend dependencies and build output
+node_modules/
+wwwroot/dist/
+wwwroot/build/
+
+# Coverage and profiling output
+coverage/
+.coverage
+*.coverage
+*.coveragexml
+
+# Operating system files
+.DS_Store
+Thumbs.db
