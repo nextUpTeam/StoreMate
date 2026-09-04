@@ -1,0 +1,6 @@
+@StoreMate.API_HostAddress = http://localhost:5032
+
+GET {{StoreMate.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
