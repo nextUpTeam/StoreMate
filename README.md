@@ -82,6 +82,76 @@ docs/
 	workflows/
 ```
 
+## Deployment Guides
+
+- [Web deployment recommendation](docs/deployment-guides/web-deployment-recommendation.md)
+- [Android deployment flow](docs/deployment-guides/android-deployment-flow.md)
+- [Architecture overview](docs/architecture/overview.md)
+- [Onion Architecture rules](docs/architecture/onion-architecture.md)
+- [Multi-store security](docs/architecture/multi-store-security.md)
+- [Offline synchronization](docs/architecture/offline-sync.md)
+- [Idempotency](docs/architecture/idempotency.md)
+- [Database schema guidance](docs/database/schema.md)
+- [API versioning](docs/api/api-versioning.md)
+- [Environment deployment](docs/deployment/deployment.md)
+
+## Project Responsibilities and Dependencies
+
+The solution follows `Domain <- Application <- Infrastructure <- API`. Domain contains business rules, Application contains use cases and ports, Infrastructure contains EF Core and external integrations, and API exposes HTTP endpoints and composes dependencies. Admin Portal and Mobile are independent clients that communicate with the API and must not reference Infrastructure.
+
+See [Onion Architecture rules](docs/architecture/onion-architecture.md) for the allowed project dependency matrix.
+
+## Local Setup
+
+Install the .NET 8 SDK, Git, and a local SQL Server option such as LocalDB, SQL Server Developer Edition, or a SQL Server container. Cloud resources are not required for local development.
+
+```bash
+dotnet restore storemate.sln
+dotnet build storemate.sln
+```
+
+### SQL Server and EF Core
+
+Configure `ConnectionStrings:DefaultConnection` in `src/StoreMate.API/appsettings.Development.json` or through an environment variable. Never commit credentials. Once Infrastructure contains the DbContext and migrations, apply them with:
+
+```bash
+dotnet ef database update --project src/StoreMate.Infrastructure --startup-project src/StoreMate.API
+```
+
+Keep migrations under `StoreMate.Infrastructure`, review generated SQL/schema changes, and apply production migrations through an approved release process.
+
+### Run the Applications
+
+Run the API with:
+
+```bash
+dotnet run --project src/StoreMate.API
+```
+
+Swagger/OpenAPI should be enabled only in Development or another protected environment. The Admin Portal will be run with its Blazor project command once its project type is finalized. The Mobile project will be run with .NET MAUI Android tooling on an emulator or physical device once it is converted from the current scaffold into an executable MAUI application. Both clients must use the API URL and never connect directly to SQL Server.
+
+### Seed Users
+
+Development seed data should create non-production Admin and Clerk users with documented, disposable credentials. Production users must be created through a secure administrative flow; never commit or reuse development passwords.
+
+### Testing
+
+Run all solution tests locally:
+
+```bash
+dotnet test storemate.sln
+```
+
+Unit tests should cover Domain and Application rules. Integration tests should be added where API, persistence, authentication, or external service behavior crosses a boundary and should use an isolated test database/configuration.
+
+## Deployment Overview
+
+The target production platform is Azure: Admin Portal and StoreMate API on Azure App Service, Azure SQL for data, Azure Key Vault for secrets, Azure Blob Storage for documents/invoices, and GitHub Actions for CI/CD. Mobile applications are distributed through Android/iOS app stores. See [environment deployment](docs/deployment/deployment.md) for Development, QA, Staging, Production, and approval rules.
+
+## Code Quality
+
+All changes should follow SOLID, Clean Code, DRY, and Dependency Inversion principles. Prefer meaningful names, centralized constants, centralized authorization/validation policies, async/await for I/O, `CancellationToken` propagation, and nullable reference types. Keep controllers thin, avoid duplicated business rules, and add focused tests when behavior changes.
+
 ## Getting Started (Local)
 
 ### Prerequisites
